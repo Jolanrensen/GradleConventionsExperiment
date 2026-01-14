@@ -1,0 +1,14 @@
+[versions]
+kotlin = "2.3.0"
+dataframe = "1.0.0-Beta4"
+kandy = "0.8.3"
+
+[libraries]
+dataframe = "1.0.0-Beta4"
+kandy = "0.8.3"
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+
+# The Kotlin DataFrame Compiler plugin is the same version as the Kotlin plugin.
+kotlin-dataframe = { id = "org.jetbrains.kotlin.plugin.dataframe", version.ref = "kotlin" }
