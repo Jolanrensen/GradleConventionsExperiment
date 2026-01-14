@@ -3,8 +3,7 @@ pluginManagement {
 }
 
 plugins {
-    id("mysettings.version-catalog")
-    id("mysettings.convention-catalog")
+    id("mysettings.catalogs-inside-convention-plugins")
 }
 
 rootProject.name = "build-logic"

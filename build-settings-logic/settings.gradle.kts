@@ -1,8 +1,3 @@
-import dev.panuszewski.gradle.TypesafeConventionsExtension
-import org.gradle.kotlin.dsl.assign
-import org.gradle.kotlin.dsl.getByType
-import kotlin.apply
-
 rootProject.name = "build-settings-logic"
 
 dependencyResolutionManagement {

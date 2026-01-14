@@ -1,6 +1,5 @@
 plugins {
     id("mysettings.base")
-    id("dev.panuszewski.typesafe-conventions")
 }
 
 fun getRootDir(): File {

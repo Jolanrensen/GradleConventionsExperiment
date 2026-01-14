@@ -1,23 +1,82 @@
 # gradleConventionsTest
 
 This project uses [Gradle](https://gradle.org/).
-To build and run the application, use the *Gradle* tool window by clicking the Gradle icon in the right-hand toolbar,
-or run it directly from the terminal:
 
-* Run `./gradlew run` to build and run the application.
-* Run `./gradlew build` to only build the application.
-* Run `./gradlew check` to run all checks, including tests.
-* Run `./gradlew clean` to clean all build outputs.
+It forms an experimental basis to be used in [Kotlin DataFrame](https://github.com/Kotlin/dataframe).
 
-Note the usage of the Gradle Wrapper (`./gradlew`).
-This is the suggested way to use Gradle in production projects.
+DataFrame is a big library with a lot of modules and examples that we wish to both test and share.
+This repo contains my test project for relevant Gradle conventions.
 
-[Learn more about the Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html).
+We have two modules that represent a "project" like DataFrame:
+* [`:app`](./app) - some main module that contains the application code.
+* [`:utils`](./utils) - a module that contains some shared code that should be compiled and tested in a dev-example.
 
-[Learn more about Gradle tasks](https://docs.gradle.org/current/userguide/command_line_interface.html#common_tasks).
+## Convention plugins
 
-This project follows the suggested multi-module setup and consists of the `app` and `utils` subprojects.
-The shared build logic was extracted to a convention plugin located in `buildSrc`.
+The entire project is built using [Composite Builds](https://docs.gradle.org/current/userguide/composite_builds.html)
+and [Pre-compiled Script Plugins](https://docs.gradle.org/current/userguide/implementing_gradle_plugins_precompiled.html)
+acting as [Convention Plugins](https://docs.gradle.org/current/userguide/implementing_gradle_plugins_convention.html).
 
-This project uses a version catalog (see `gradle/libs.versions.toml`) to declare and version dependencies
-and both a build cache and a configuration cache (see `gradle.properties`).
+In practice, this means we try to put all build logic for `build.gradle.kts` files
+in the [`build-logic` directory](./build-logic) and all build logic for `settings.gradle.kts` files
+in the [`build-settings-logic` directory](./build-settings-logic) (Following the example of [dokka](https://github.com/Kotlin/dokka)).
+
+### For settings.gradle.kts files
+At the moment, this project only has one "active" project, namely, the root project ":gradleConventionsTest".
+However, DataFrame has multiple projects, that are included with `includeBuild` in the root `settings.gradle.kts`.
+
+To sync settings and, most importantly, the version catalog, we can create Gradle settings files in
+[the `build-settings-logic/src/main/kotlin` folder](./build-settings-logic/src/main/kotlin).
+
+It's a Dokka convention to name the files something like `<prefix>settings.<name>.settings.gradle.kts`.
+
+Check out [`mysettings.base.settings.gradle.kts`](./build-settings-logic/src/main/kotlin/mysettings.base.settings.gradle.kts); 
+It contains everything we commonly put in a `settings.gradle.kts` file, like repositories and plugins.
+
+Scripts can inherit each other, by using the `plugins { }` block (unfortunately, this cannot be done type safely).
+Check out [`mysettings.version-catalog`](./build-settings-logic/src/main/kotlin/mysettings.version-catalog.settings.gradle.kts)
+for an example. It builds on top of `mysettings.base`, but it also sets up the `libs` version catalog by searching for the top-level `libs.versions.toml` file.
+This Convention Plugin can be applied to any `settings.gradle.kts` file in the project.
+
+Similarly, I've created [`mysettings.convention-catalog`](./build-settings-logic/src/main/kotlin/mysettings.convention-catalog.settings.gradle.kts).
+This plugin scans the [`build-logic` directory](./build-logic) for convention plugins and adds them to a version catalog called "convention".
+This way, we can refer to convention plugins safely just like libraries!
+
+Both scripts are joined together in [`mysettings.catalogs`](./build-settings-logic/src/main/kotlin/mysettings.catalogs.settings.gradle.kts)
+which is actually applied to the root project.
+
+Finally, we want to be able to use both version catalogs in [`build-logic`](./build-logic) as well for type safe access
+of libraries and convention plugins.
+The [Gradle documentation](https://docs.gradle.org/current/userguide/version_catalogs.html#sec:buildsrc-version-catalog) states this is not possible yet and recommends a workaround.
+However, we can use the [Typesafe Conventions Gradle Plugin](https://github.com/radoslaw-panuszewski/typesafe-conventions-gradle-plugin)
+for this purpose. It's used in a lot of projects on GitHub and is actively maintained.
+We set it up in [`mysettings.catalogs-inside-convention-plugins`](./build-settings-logic/src/main/kotlin/mysettings.catalogs-inside-convention-plugins.settings.gradle.kts)
+and use it in [`build-logic/settings.gradle.kts`](./build-logic/settings.gradle.kts).
+Now we can also use the version catalogs in the `build-logic` directory :).
+
+(One gotcha: any plugin you want to apply from a build-settings convention plugin must also be declared in the depenendencies of the outer
+[`build-settings-logic/build.gradle.kts`](./build-settings-logic/build.gradle.kts) file, 
+as well as (potentially non-applied) plugin in [`build-settings-logic/settings.gradle.kts`](./build-settings-logic/settings.gradle.kts)
+otherwise Gradle cannot find it)
+
+### For build.gradle.kts files
+Now, to share dependencies and build logic between modules, we can create Gradle build scripts in
+[the `build-logic/src/main/kotlin` folder](./build-logic/src/main/kotlin).
+
+It's a Dokka convention to name the files something like `<prefix>build.<name>.gradle.kts`.
+
+Check out [`mybuild.kotlinJvm`](./build-logic/src/main/kotlin/mybuild.kotlinJvm.gradle.kts).
+This is an example plugin that sets up Kotlin JVM for any module applying it.
+In contrast to the settings scripts, we can now access other build logic scripts safely, like
+`plugins { alias(convention.plugins.base) }`, for instance.
+We can also use normal Kotlin files to share code between scripts, like [`camelCase.kt`](./build-logic/src/main/kotlin/mybuild/camelCase.kt)
+
+Convention plugins can also be created to "group" build logic together.
+We wanted to set up build tasks for our examples and configure them correctly, however, polluting the main [`build.gradle.kts`](./build.gradle.kts) file
+with all the configuration is not ideal.
+Therefore, I created [`mybuild.buildExampleProjects`](./build-logic/src/main/kotlin/mybuild.buildExampleProjects.gradle.kts)
+to contain it. See below for more explanation about how it works.
+
+## Running the examples
+
+TODO
