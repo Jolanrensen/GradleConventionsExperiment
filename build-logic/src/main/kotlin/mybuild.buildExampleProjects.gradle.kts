@@ -19,16 +19,18 @@ val promoteExamples by tasks.registering {
     group = "publishing"
     description = "Promotes the /projects/dev example projects to /projects"
 
+    val projectsFolder = file("projects")
+
     doLast {
         // Deletes existing projects before promotion
-        file("projects").listFiles()?.forEach {
+        projectsFolder.listFiles()?.forEach {
             if (!it.isDirectory || it.name == "dev") return@forEach
             it.deleteRecursively()
         }
         logger.lifecycle("Removed example projects from /projects")
-        file("projects/dev").listFiles()?.forEach {
+        projectsFolder.resolve("dev").listFiles()?.forEach {
             if (!it.isDirectory) return@forEach
-            it.copyRecursively(file("projects/${it.name}"))
+            it.copyRecursively(projectsFolder.resolve(it.name))
         }
         logger.lifecycle("Copied example projects from /projects/dev to /projects")
     }

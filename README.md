@@ -90,4 +90,26 @@ In this example, we add and substitute the `:utils` module.
 
 The idea is that the project in the `dev` folder is kept up to date with the root project,
 so that we can catch breaking API changes early.
-When we create a new release, we can copy the contents of the `dev` folder upwards by simply calling the [`promoteExamples`](`./gradlew promoteExamples`) task.
+When we create a new release, we can copy the contents of the `dev` folder upwards by simply calling the
+[`promoteExamples`](`./gradlew promoteExamples`) task.
+
+See the Convention plugin [`mybuild.buildExampleProjects`](./build-logic/src/main/kotlin/mybuild.buildExampleProjects.gradle.kts).
+This plugin is applied to the root project and creates the necessary tasks to interact with the examples.
+
+It creates two sets of tasks:
+* [`syncExampleFolders`](`./gradlew syncExampleFolders`) (and specific `sync-` tasks for each example project)
+* [`buildExampleFolders`](`./gradlew buildExampleFolders`) (and specific `build-` tasks for each example project)
+
+The `sync` tasks take care of overwriting Gradle setup file contents based on the root project.
+This includes:
+- gradle-wrapper.properties
+- gradle.properties
+- libs.versions.toml (syncing only the versions you specify)
+- settings.gradle.kts (handling the `includeBuild` directive for the dev-example)
+
+The `build` tasks use the Gradle Tooling API to `clean build` all example projects.
+
+The tasks are linked to the main `assemble` and `check` tasks, respectively, so they are run automatically.
+We will need to modify our GitHub Actions workflow to run the `syncExampleFolders` task on push to the master branch
+and commit any changes made, to keep the examples up to date with the root project.
+
