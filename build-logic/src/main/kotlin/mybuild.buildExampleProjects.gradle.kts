@@ -1,4 +1,5 @@
 import mybuild.toCamelCaseByDelimiters
+import org.gradle.kotlin.dsl.registering
 import org.gradle.tooling.GradleConnector
 
 plugins {
@@ -12,6 +13,26 @@ val syncExampleFolders by tasks.registering {
 val buildExampleFolders by tasks.registering {
     group = "verification"
     description = "Builds the nested Gradle build in ./projects to verify they compile correctly."
+}
+
+val promoteExamples by tasks.registering {
+    group = "publishing"
+    description = "Promotes the /projects/dev example projects to /projects"
+
+    doLast {
+        // Deletes existing projects before promotion
+        file("projects").listFiles()?.forEach {
+            if (!it.isDirectory || it.name == "dev") return@forEach
+            it.deleteRecursively()
+        }
+        logger.lifecycle("Removed example projects from /projects")
+        file("projects/dev").listFiles()?.forEach {
+            if (!it.isDirectory) return@forEach
+            it.copyRecursively(file("projects/${it.name}"))
+        }
+        logger.lifecycle("Copied example projects from /projects/dev to /projects")
+    }
+    finalizedBy(syncExampleFolders)
 }
 
 tasks.named("assemble") {
@@ -77,15 +98,19 @@ fun setupBuildTask(
 fun setupSyncVersionsTask(
     name: String,
     folder: File,
-    isDev: Boolean
+    isDev: Boolean,
+    versionsToSync: List<String> = listOf("kotlin", "dataframe", "kandy")
 ): TaskProvider<Task> =
     tasks.register("sync$name") {
         group = "build"
         description = "Sync the versions in the nested Gradle build in ./${folder.name}"
 
-        val kotlinVersion = libs.versions.kotlin.get()
-        val dataframeVersion = libs.versions.dataframe.get()
-        val kandyVersion = libs.versions.kandy.get()
+        outputs.upToDateWhen { false }
+
+        val libs = versionCatalogs.named("libs")
+        val versions = versionsToSync.associateWith {
+            libs.findVersion(it).get().requiredVersion
+        }
 
         val sourceGradleWrapperProperties = file("gradle/wrapper/gradle-wrapper.properties")
 
@@ -106,51 +131,48 @@ fun setupSyncVersionsTask(
             )
 
             // overwrite libs.versions.toml
-            val libsVersionsToml = folder.resolve("libs.versions.toml")
+            val libsVersionsToml = folder.resolve("gradle/libs.versions.toml")
+            val versionRegex = """([a-zA-Z0-9-]+)\s*=\s*".+"""".toRegex()
             val newLibsVersionsTomlContent = libsVersionsToml.readText().lines().joinToString("\n") {
-                when {
-                    it.startsWith("kotlin =") -> """kotlin = "$kotlinVersion""""
-                    it.startsWith("dataframe =") -> """dataframe = "$dataframeVersion""""
-                    it.startsWith("kandy =") -> """kandy = "$kandyVersion""""
-                    else -> it
-                }
+                val match = versionRegex.matchEntire(it) ?: return@joinToString it
+                val name = match.groupValues[1]
+                if (name !in versions) return@joinToString it
+
+                """$name = "${versions[name]}""""
             }
             libsVersionsToml.writeText(newLibsVersionsTomlContent)
 
             // overwrite settings.gradle.kts
-            val generatedConfig = buildString {
-                appendLine("// region generated-config")
-                val rootProjectName = folder.name + (if (isDev) "-dev" else "")
-                appendLine("""rootProject.name = "$rootProjectName"""")
-                if (isDev) {
-                    appendLine(
-                        """
-                        includeBuild("../../..") {
-                            dependencySubstitution {
-                                substitute(module("org:example")).using(project(":utils"))
-                            }
-                        }
-                        """.trimIndent()
-                    )
-                }
-                appendLine("// endregion")
-            }
+
+            // this can also be done by the --include-build argument,
+            // however, writing it in the settings.gradle.kts file makes the IDE aware of the dependency substitution
+            val generatedDevConfig =
+                """
+                // region generated-config
+                
+                // substitutes dependencies provided by the root project
+                includeBuild("../../..")
+                
+                // endregion
+                """.trimIndent()
 
             val regex = "// region generated-config(\\n|.)*?// endregion".toRegex()
             val settingsGradleKts = folder.resolve("settings.gradle.kts")
             val settingsGradleKtsContent = settingsGradleKts.readText()
             val newSettingsGradleKtsContent =
                 when (regex) {
-                    in settingsGradleKtsContent ->
-                        settingsGradleKtsContent.replace(regex, generatedConfig)
+                    in settingsGradleKtsContent if isDev ->
+                        settingsGradleKtsContent.replace(regex, generatedDevConfig)
 
-                    !in settingsGradleKtsContent ->
-                        """
-                        $settingsGradleKtsContent
-                        $generatedConfig
-                        """.trimIndent()
+                    !in settingsGradleKtsContent if isDev ->
+                        settingsGradleKtsContent + "\n" + generatedDevConfig
 
-                    else -> settingsGradleKtsContent
+                    in settingsGradleKtsContent if !isDev ->
+                        settingsGradleKtsContent.replace(regex, "")
+
+                    else ->
+                        settingsGradleKtsContent
+
                 }
             settingsGradleKts.writeText(newSettingsGradleKtsContent)
         }

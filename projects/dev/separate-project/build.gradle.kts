@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org:example")
+    implementation("org.example:utils")
 
     // Add general `dataframe` dependency
     implementation(libs.dataframe)

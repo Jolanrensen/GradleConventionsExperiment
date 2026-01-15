@@ -9,18 +9,10 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
+rootProject.name = "separate-project"
 // region generated-config
-rootProject.name = "separate-project-dev"
-includeBuild("../../..") {
-    dependencySubstitution {
-        substitute(module("org:example")).using(project(":utils"))
-    }
-}
+
+// substitutes dependencies provided by the root project
+includeBuild("../../..")
+
 // endregion
-
-
-
-
-
-
-

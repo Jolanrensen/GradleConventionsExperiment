@@ -11,3 +11,5 @@ dependencies {
     implementation(libs.bundles.kotlinxEcosystem)
     testImplementation(kotlin("test"))
 }
+
+group = "org.example"

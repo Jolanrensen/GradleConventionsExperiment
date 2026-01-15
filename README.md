@@ -77,6 +77,17 @@ with all the configuration is not ideal.
 Therefore, I created [`mybuild.buildExampleProjects`](./build-logic/src/main/kotlin/mybuild.buildExampleProjects.gradle.kts)
 to contain it. See below for more explanation about how it works.
 
-## Running the examples
+## The example projects
 
-TODO
+The example projects are located in the [`projects` directory](./projects).
+
+The ones in the root are meant to be run as standalone projects by users.
+They should be downloadable as zips and require no extra setup to run.
+
+The ones in the [`dev` folder](./projects/dev) can also be run as standalone projects from the IDE, but
+they are tested with the root project in a composite build, to catch breaking API changes.
+In this example, we add and substitute the `:utils` module.
+
+The idea is that the project in the `dev` folder is kept up to date with the root project,
+so that we can catch breaking API changes early.
+When we create a new release, we can copy the contents of the `dev` folder upwards by simply calling the [`promoteExamples`](`./gradlew promoteExamples`) task.
