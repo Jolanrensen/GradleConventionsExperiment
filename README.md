@@ -17,7 +17,7 @@ The entire project is built using [Composite Builds](https://docs.gradle.org/cur
 and [Pre-compiled Script Plugins](https://docs.gradle.org/current/userguide/implementing_gradle_plugins_precompiled.html)
 acting as [Convention Plugins](https://docs.gradle.org/current/userguide/implementing_gradle_plugins_convention.html).
 
-In practice, this means we try to put all build logic for `build.gradle.kts` files
+In practice, this means we try to put all shared build logic for `build.gradle.kts` files
 in the [`build-logic` directory](./build-logic) and all build logic for `settings.gradle.kts` files
 in the [`build-settings-logic` directory](./build-settings-logic) (Following the example of [dokka](https://github.com/Kotlin/dokka)).
 
