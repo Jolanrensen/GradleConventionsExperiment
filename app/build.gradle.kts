@@ -5,6 +5,12 @@ plugins {
 
     // Apply the Application plugin to add support for building an executable JVM application.
     application
+
+    alias(convention.plugins.conventionWithInput)
+}
+
+conventionWithInput {
+    inputList = listOf("1", "2", "3")
 }
 
 dependencies {
