@@ -1,4 +1,4 @@
-# gradleConventionsTest
+# Gradle Conventions Experiment
 
 This project uses [Gradle](https://gradle.org/).
 
