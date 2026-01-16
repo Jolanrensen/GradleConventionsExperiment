@@ -61,6 +61,19 @@ Now we can also use the version catalogs in the `build-logic` directory :).
 as well as (potentially non-applied) plugin in [`build-settings-logic/settings.gradle.kts`](./build-settings-logic/settings.gradle.kts)
 otherwise Gradle cannot find it)
 
+These build settings logic plugins can be applied in any `settings.gradle.kts` file like:
+```kts
+pluginManagement {
+    includeBuild("path/to/build-settings-logic")
+    ...
+}
+
+plugins {
+    id("mysettings.<NAME_OF_PLUGIN>")
+    ...
+}
+```
+
 ### For build.gradle.kts files
 Now, to share dependencies and build logic between modules, we can create Gradle build scripts in
 [the `build-logic/src/main/kotlin` folder](./build-logic/src/main/kotlin).
@@ -78,6 +91,18 @@ We wanted to set up build tasks for our examples and configure them correctly, h
 with all the configuration is not ideal.
 Therefore, I created [`mybuild.buildExampleProjects`](./build-logic/src/main/kotlin/mybuild.buildExampleProjects.gradle.kts)
 to contain it. See below for more explanation about how it works.
+
+These build logic plugins can be applied in any project by adding this to the `settings.gradle.kts` file:
+```kts
+includeBuild("path/to/build-logic")
+```
+and in the `build.gradle.kts` file:
+```kts
+plugins {
+    id("mybuild.<NAME_OF_PLUGIN>")
+    ...
+}
+```
 
 ## The example projects
 
