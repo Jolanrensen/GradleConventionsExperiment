@@ -27,6 +27,8 @@ However, DataFrame has multiple projects, that are included with `includeBuild` 
 
 To sync settings and, most importantly, the version catalog, we can create Gradle settings files in
 [the `build-settings-logic/src/main/kotlin` folder](./build-settings-logic/src/main/kotlin).
+We can also use build-settings plugins from [`build-settings-logic`](./build-settings-logic) inside [`build-logic`](./build-logic)
+if applied! We will use this to create type-safe convention plugin references inside [`build-logic`](./build-logic) scripts.
 
 It's a Dokka convention to name the files something like `<prefix>settings.<name>.settings.gradle.kts`.
 
