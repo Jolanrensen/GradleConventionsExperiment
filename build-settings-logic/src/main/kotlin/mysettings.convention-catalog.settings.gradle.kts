@@ -1,14 +1,9 @@
+import mysettings.findRootDir
+
 plugins {
     id("mysettings.base")
 }
 
-fun getRootDir(): File {
-    var rootDir = settingsDir
-    while (!rootDir.resolve("gradlew").exists()) {
-        rootDir = rootDir.parentFile
-    }
-    return rootDir!!
-}
 /*
  * Creates a version catalog with convention plugins.
  */
@@ -16,7 +11,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         // generate type-safe accessors for convention plugins
         create("convention") {
-            val buildConventionFiles = getRootDir()
+            val buildConventionFiles = findRootDir()
                 .resolve("build-logic/src/main/kotlin").listFiles()!!
 
             for (it in buildConventionFiles) {

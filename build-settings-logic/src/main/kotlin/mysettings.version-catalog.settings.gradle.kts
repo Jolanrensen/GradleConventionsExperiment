@@ -1,14 +1,9 @@
+import mysettings.findRootDir
+
 plugins {
     id("mysettings.base")
 }
 
-fun getRootDir(): File {
-    var rootDir = settingsDir
-    while (!rootDir.resolve("gradlew").exists()) {
-        rootDir = rootDir.parentFile
-    }
-    return rootDir!!
-}
 /*
  * Base convention plugin for settings.gradle.kts files.
  * This makes sure all Gradle projects use the same version catalog.
@@ -21,12 +16,12 @@ dependencyResolutionManagement {
             try {
                 from(
                     files(
-                        getRootDir().resolve("gradle/libs.versions.toml").absolutePath,
+                        findRootDir().resolve("gradle/libs.versions.toml").absolutePath,
                     ),
                 )
             } catch (e: Exception) {
                 logger.warn(
-                    "Could not load version catalog (${getRootDir().absolutePath}/gradle/libs.versions.toml) from $settingsDir",
+                    "Could not load version catalog (${findRootDir().absolutePath}/gradle/libs.versions.toml) from $settingsDir",
                     e
                 )
             }
