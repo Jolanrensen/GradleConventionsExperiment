@@ -5,14 +5,16 @@ plugins {
 }
 
 /*
- * Creates a version catalog with convention plugins.
+ * Creates a version catalog with build-logic convention plugins.
  */
 dependencyResolutionManagement {
     versionCatalogs {
         // generate type-safe accessors for convention plugins
         create("convention") {
             val buildConventionFiles = findRootDir()
-                .resolve("build-logic/src/main/kotlin").listFiles()!!
+                .resolve("build-logic/src/main/kotlin")
+                .listFiles()
+                ?: emptyArray()
 
             for (it in buildConventionFiles) {
                 if (!it.isFile || !it.name.endsWith(".gradle.kts")) continue

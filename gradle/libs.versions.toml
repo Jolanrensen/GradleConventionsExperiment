@@ -9,7 +9,7 @@ kandy = "0.8.3"
 kotlinxDatetime = "0.7.1"
 kotlinxSerializationJSON = "1.9.0"
 kotlinxCoroutines = "1.10.2"
-gradlePlugin-gradle-foojayToolchains = "0.10.0"
+gradlePlugin-gradle-foojayToolchains = "1.0.0"
 typesafe-conventions = "0.10.0"
 
 [libraries]

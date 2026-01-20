@@ -2,7 +2,7 @@ plugins {
     `kotlin-dsl`
 }
 
-description = "Conventions for use in settings.gradle.kts scripts"
+description = "Conventions to use in settings.gradle.kts scripts"
 
 dependencies {
     implementation(libs.gradlePlugin.gradle.foojayToolchains)

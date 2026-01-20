@@ -8,6 +8,7 @@ pluginManagement {
 }
 
 plugins {
+    id("mysettings.base")
     id("mysettings.catalogs")
 }
 
