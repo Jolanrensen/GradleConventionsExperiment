@@ -1,6 +1,10 @@
 rootProject.name = "build-settings-logic"
 
 dependencyResolutionManagement {
+    // allows submodules to override repositories
+    // Careful! Once you write `repositories {}`, the ones below are NOT included anymore
+    repositoriesMode = RepositoriesMode.PREFER_PROJECT
+
     repositories {
         gradlePluginPortal()
         mavenCentral()
