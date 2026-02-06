@@ -176,6 +176,9 @@ fun setupSyncVersionsTask(
                         settingsGradleKtsContent
 
                 }
+                    // keep only one newline at the end
+                    .dropLastWhile { it == '\n' }.plus('\n')
+
             settingsGradleKts.writeText(newSettingsGradleKtsContent)
         }
     }
