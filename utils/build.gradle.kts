@@ -1,7 +1,7 @@
 plugins {
     // Apply the shared build logic from a convention plugin.
     // The shared code is located in `build-logic/src/main/kotlin/mybuild.kotlinJvm.gradle.kts`.
-    alias(convention.plugins.kotlinJvm)
+    alias(conventions.plugins.mybuild.kotlinJvm)
     // Apply Kotlin Serialization plugin from `gradle/libs.versions.toml`.
     alias(libs.plugins.kotlinPluginSerialization)
 }

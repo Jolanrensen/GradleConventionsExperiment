@@ -7,7 +7,7 @@ import mybuild.conventionWithInput.ConventionWithInputTask
  */
 
 plugins {
-    alias(convention.plugins.base)
+    alias(conventions.plugins.mybuild.base)
 }
 
 val conventionWithInputExtension = extensions.create<ConventionWithInputExtension>(ConventionWithInputExtension.NAME)

@@ -4,7 +4,7 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    alias(convention.plugins.base)
+    alias(conventions.plugins.mybuild.base)
     // Apply the Kotlin JVM plugin to add support for Kotlin in JVM projects.
     alias(libs.plugins.kotlinJvm)
 }
@@ -23,7 +23,7 @@ tasks.withType<Test>().configureEach {
         events(
             TestLogEvent.FAILED,
             TestLogEvent.PASSED,
-            TestLogEvent.SKIPPED
+            TestLogEvent.SKIPPED,
         )
     }
 }

@@ -1,5 +1,3 @@
-import org.gradle.kotlin.dsl.support.expectedKotlinDslPluginsVersion
-
 plugins {
     // The Kotlin DSL plugin provides a convenient way to develop convention plugins.
     // Convention plugins are located in `src/main/kotlin`, with the file extension `.gradle.kts`,
@@ -9,10 +7,4 @@ plugins {
 
 kotlin {
     jvmToolchain(23)
-}
-
-dependencies {
-    // Add a dependency on the Kotlin Gradle plugin, so that convention plugins can apply it.
-    implementation(libs.kotlinGradlePlugin)
-    implementation("org.gradle.kotlin:gradle-kotlin-dsl-plugins:${expectedKotlinDslPluginsVersion}")
 }

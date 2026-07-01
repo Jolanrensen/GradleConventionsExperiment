@@ -3,7 +3,7 @@ import org.gradle.kotlin.dsl.registering
 import org.gradle.tooling.GradleConnector
 
 plugins {
-    alias(convention.plugins.kotlinJvm)
+    alias(conventions.plugins.mybuild.kotlinJvm)
 }
 
 val syncExampleFolders by tasks.registering {

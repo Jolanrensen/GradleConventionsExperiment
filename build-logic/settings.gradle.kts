@@ -4,7 +4,8 @@ pluginManagement {
 
 plugins {
     id("mysettings.base")
-    id("mysettings.catalogs-inside-convention-plugins")
+    id("mysettings.version-catalog")
+    id("dev.panuszewski.typesafe-conventions") version "0.11.1"
 }
 
 rootProject.name = "build-logic"

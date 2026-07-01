@@ -1,12 +1,12 @@
 plugins {
     // Apply the shared build logic from a convention plugin.
     // The shared code is located in `build-logic/src/main/kotlin/mybuild.kotlinJvm.gradle.kts`.
-    alias(convention.plugins.kotlinJvm)
+    alias(conventions.plugins.mybuild.kotlinJvm)
 
     // Apply the Application plugin to add support for building an executable JVM application.
     application
 
-    alias(convention.plugins.conventionWithInput)
+    alias(conventions.plugins.mybuild.conventionWithInput)
 }
 
 conventionWithInput {

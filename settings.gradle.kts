@@ -9,7 +9,7 @@ pluginManagement {
 
 plugins {
     id("mysettings.base")
-    id("mysettings.catalogs")
+    id("mysettings.version-catalog")
 }
 
 // Include the `app` and `utils` subprojects in the build.
